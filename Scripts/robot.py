@@ -102,24 +102,26 @@ class Robot:
                 
                 '''
                 
-#                if 'delete' in robotText:
+                if 'delete' in robotText:
                     
-#                    #remove the string from the tracked projects list
-#                    newText = ""
-#                    with open("/var/www/html/trackedProjects.txt", "r") as f:
-#                        text = f.read()
-#                        newText = text.replace(repo.html_url,'')
-#                    with open("/var/www/html/trackedProjects.txt", "w") as f:
-#                        f.write(newText)
+                    self.deleteRepo(repo)
                     
-                    #delete the repo
-                    repo.delete()
                 
             else:
                 print "This project is not community managed"
         except Exception as e:
             print "This repo does not have a ROBOT.md file"
             print e
+    
+    def deleteRepo(self, repo):
+        '''
+        
+        Deletes the target repo and removes it from the tracked projects list
+        
+        '''
+        
+        #delete the repo
+        repo.delete()
     
     def fixImageLinks(self,repo):
         
