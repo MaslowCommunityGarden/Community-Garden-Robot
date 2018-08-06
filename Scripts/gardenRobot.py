@@ -33,7 +33,7 @@ repos = org.get_repos()
 
 for repo in repos:
     #handle pull requests by voting through the community garden robot
-    robot.voteOnPRs(repo)
+    robot.voteOnPRs(repo, org)
     #fix any broken image links in the repo README files
     if weShouldCheckImageLinks:
         robot.fixImageLinks(repo)

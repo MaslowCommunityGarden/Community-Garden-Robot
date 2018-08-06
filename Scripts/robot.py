@@ -7,7 +7,7 @@ import          json
 
 class Robot:
     
-    def voteOnPRs(self, repo):
+    def voteOnPRs(self, repo, org):
         '''
         
         Runs to tally votes on open pull requests if the project is community managed
@@ -98,13 +98,13 @@ class Robot:
                 
                 '''
                 
-                Check if there are any open pull requests that need to be voted on
+                Check if the repo needs to be deleted
                 
                 '''
                 
                 if 'delete' in robotText:
                     
-                    self.deleteRepo(repo)
+                    self.deleteRepo(repo, org)
                     
                 
             else:
@@ -119,6 +119,24 @@ class Robot:
         Deletes the target repo and removes it from the tracked projects list
         
         '''
+        
+        #This section removes a tracked project name from the tracked projects list in github
+        
+        #Find the tracked projects text
+        
+        trackedProjectsRepo = org.get_repo('Website')
+        
+        fileName = '/trackedProjects.txt'
+        
+        #get the tracked projects list and decode it
+        fileContents = trackedProjectsRepo.get_file_contents(fileName)
+        trackedProjectsList = base64.b64decode(fileContents.content)
+        
+        #remove this project
+        updatedTrackedProjectsList = trackedProjectsList.replace(repo.html_url,'')
+        
+        #push the updated list back to the github server
+        trackedProjectsRepo.update_file(fileName, "remove a project", updatedTrackedProjectsList, fileContents.sha)
         
         #delete the repo
         repo.delete()
