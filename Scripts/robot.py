@@ -102,15 +102,15 @@ class Robot:
                 
                 '''
                 
-                if 'delete' in robotText:
+#                if 'delete' in robotText:
                     
-                    #remove the string from the tracked projects list
-                    newText = ""
-                    with open("/var/www/html/trackedProjects.txt", "r") as f:
-                        text = f.read()
-                        newText = text.replace(repo.html_url,'')
-                    with open("/var/www/html/trackedProjects.txt", "w") as f:
-                        f.write(newText)
+#                    #remove the string from the tracked projects list
+#                    newText = ""
+#                    with open("/var/www/html/trackedProjects.txt", "r") as f:
+#                        text = f.read()
+#                        newText = text.replace(repo.html_url,'')
+#                    with open("/var/www/html/trackedProjects.txt", "w") as f:
+#                        f.write(newText)
                     
                     #delete the repo
                     repo.delete()
