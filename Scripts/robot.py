@@ -103,7 +103,6 @@ class Robot:
                 '''
                 
                 if 'delete' in robotText:
-                    print "delete detected"
                     self.deleteRepo(repo, org)
                     
                 
