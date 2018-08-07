@@ -105,8 +105,6 @@ class Robot:
                 if 'delete' in robotText:
                     print "delete detected"
                     self.deleteRepo(repo, org)
-                else:
-                    print "delete not detected"
                     
                 
             else:
@@ -115,7 +113,7 @@ class Robot:
             print "This repo does not have a ROBOT.md file"
             print e
     
-    def deleteRepo(self, repo):
+    def deleteRepo(self, repo, org):
         '''
         
         Deletes the target repo and removes it from the tracked projects list
