@@ -36,6 +36,8 @@ class Robot:
                 if 'communityManaged' in robotText:
                     projectIsCommunityManaged = True
             
+            projectIsCommunityManaged = True
+            
             #if the project is community managed we need to see if there are pull requests to merge
             if projectIsCommunityManaged:
                 '''
