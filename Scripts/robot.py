@@ -7,7 +7,7 @@ import          json
 
 class Robot:
     
-    def voteOnPRs(self, repo):
+    def voteOnPRs(self, repo, org):
         '''
         
         Runs to tally votes on open pull requests if the project is community managed
@@ -35,6 +35,8 @@ class Robot:
             except:                                                     #If it's not a json file fall back to the old technique
                 if 'communityManaged' in robotText:
                     projectIsCommunityManaged = True
+            
+            projectIsCommunityManaged = True
             
             #if the project is community managed we need to see if there are pull requests to merge
             if projectIsCommunityManaged:
@@ -82,7 +84,7 @@ class Robot:
                             if elapsedTime < fourtyEightHoursInSeconds:
                                 pass
                             else:
-                                if upVotes > downVotes:
+                                if (upVotes - 1) > downVotes:         # back out the robot's vote
                                     commentText = "Time is up and we're ready to merge this pull request. Great work!"
                                     theNewComment = prAsIssue.create_comment(commentText)
                                     pullRequest.merge()
@@ -92,34 +94,53 @@ class Robot:
                                     prAsIssue.edit(state='closed')
                     
                     if not robotHasAlreadyCommented:
-                        commentText = "Congratulations on the pull request @" + pullRequest.user.login + "\n\n Now we need to decide as a community if we want to integrate these changes. Vote by giving this comment a thumbs up or a thumbs down. Votes are counted in 48 hours. Ties will not be merged.\n\nI'm just a robot, but I love to see people contributing so I'm going vote thumbs up!"
+                        commentText = "Congratulations on the pull request @" + pullRequest.user.login + "\n\n Now we need to decide as a community if we want to integrate these changes. You should vote by giving this comment a thumbs up or a thumbs down. Votes are counted in 48 hours. Ties will not be merged.\n\nI'm just a robot, but I love to see people contributing so I'm going vote thumbs up (but my vote won't count...)!"
                         theNewComment = prAsIssue.create_comment(commentText)
                         theNewComment.create_reaction("+1")
                 
                 '''
                 
-                Check if there are any open pull requests that need to be voted on
+                Check if the repo needs to be deleted
                 
                 '''
                 
                 if 'delete' in robotText:
+                    self.deleteRepo(repo, org)
                     
-                    #remove the string from the tracked projects list
-                    newText = ""
-                    with open("/var/www/html/trackedProjects.txt", "r") as f:
-                        text = f.read()
-                        newText = text.replace(repo.html_url,'')
-                    with open("/var/www/html/trackedProjects.txt", "w") as f:
-                        f.write(newText)
-                    
-                    #delete the repo
-                    repo.delete()
                 
             else:
                 print "This project is not community managed"
         except Exception as e:
             print "This repo does not have a ROBOT.md file"
             print e
+    
+    def deleteRepo(self, repo, org):
+        '''
+        
+        Deletes the target repo and removes it from the tracked projects list
+        
+        '''
+        
+        #This section removes a tracked project name from the tracked projects list in github
+        
+        #Find the tracked projects text
+        
+        trackedProjectsRepo = org.get_repo('Website')
+        
+        fileName = '/trackedProjects.txt'
+        
+        #get the tracked projects list and decode it
+        fileContents = trackedProjectsRepo.get_file_contents(fileName)
+        trackedProjectsList = base64.b64decode(fileContents.content)
+        
+        #remove this project
+        updatedTrackedProjectsList = trackedProjectsList.replace(repo.html_url,'')
+        
+        #push the updated list back to the github server
+        trackedProjectsRepo.update_file(fileName, "remove a project", updatedTrackedProjectsList, fileContents.sha)
+        
+        #delete the repo
+        repo.delete()
     
     def fixImageLinks(self,repo):
         
