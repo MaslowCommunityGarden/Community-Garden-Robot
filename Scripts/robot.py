@@ -173,8 +173,6 @@ class Robot:
             newFileText = fileText.replace(stringToReplace, replaceWithString)
             
             print repo.full_name
-            print "We have made a change?"
-            print fileText != newFileText
             
             if fileText != newFileText: #if we have fixed at least one link
                 
