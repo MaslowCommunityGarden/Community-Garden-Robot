@@ -13,6 +13,9 @@ class Robot:
         Runs to tally votes on open pull requests if the project is community managed
         
         '''
+        
+        numberOfHoursForVoting = 48
+        
         try:
             #find the URL to the file
             trackedURL  = repo.html_url
@@ -32,6 +35,11 @@ class Robot:
                 data = json.loads(robotText)
                 if data["ModerationLevel"] == 'communityManaged':
                     projectIsCommunityManaged = True
+                try:
+                    numberOfHoursForVoting = data["VoteHours"]
+                except:
+                    pass
+                        
             except:                                                     #If it's not a json file fall back to the old technique
                 if 'communityManaged' in robotText:
                     projectIsCommunityManaged = True
@@ -80,8 +88,8 @@ class Robot:
                             elapsedTime = (datetime.datetime.now() - timeOpened).total_seconds()
                             
                             
-                            fourtyEightHoursInSeconds = 172800
-                            if elapsedTime < fourtyEightHoursInSeconds:
+                            hoursInSeconds = numberOfHoursForVoting*3600
+                            if elapsedTime < hoursInSeconds:
                                 pass
                             else:
                                 if (upVotes - 1) > downVotes:         # back out the robot's vote
@@ -177,8 +185,9 @@ class Robot:
             if fileText != newFileText: #if we have fixed at least one link
                 
                 repo.update_file(fileName, "fix image links", newFileText, fileContents.sha)
-        except:
+        except Exception as e:
             print "unable to update image links for" + str(repo.name)
+            print e
     
     def acceptInvitations(self, user):
         '''
