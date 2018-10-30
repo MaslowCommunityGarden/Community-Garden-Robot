@@ -102,7 +102,7 @@ class Robot:
                                     prAsIssue.edit(state='closed')
                     
                     if not robotHasAlreadyCommented:
-                        commentText = "Congratulations on the pull request @" + pullRequest.user.login + "\n\n Now we need to decide as a community if we want to integrate these changes. You should vote by giving **this comment** a thumbs up or a thumbs down. Votes are counted in 48 hours. Ties will not be merged.\n\nI'm just a robot, but I love to see people contributing so I'm going vote thumbs up (but my vote won't count...)!"
+                        commentText = "Congratulations on the pull request @" + pullRequest.user.login + "\n\n Now we need to decide as a community if we want to integrate these changes. You should vote by giving **this comment** a thumbs up or a thumbs down. Votes are counted in "+ str(numberOfHoursForVoting) +" hours. Ties will not be merged.\n\nI'm just a robot, but I love to see people contributing so I'm going vote thumbs up (but my vote won't count...)!"
                         theNewComment = prAsIssue.create_comment(commentText)
                         theNewComment.create_reaction("+1")
                 
