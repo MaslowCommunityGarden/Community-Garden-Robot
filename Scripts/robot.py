@@ -13,6 +13,9 @@ class Robot:
         Runs to tally votes on open pull requests if the project is community managed
         
         '''
+        
+        numberOfHoursForVoting = 48
+        
         try:
             #find the URL to the file
             trackedURL  = repo.html_url
@@ -32,6 +35,11 @@ class Robot:
                 data = json.loads(robotText)
                 if data["ModerationLevel"] == 'communityManaged':
                     projectIsCommunityManaged = True
+                try:
+                    numberOfHoursForVoting = data["VoteHours"]
+                except:
+                    pass
+                        
             except:                                                     #If it's not a json file fall back to the old technique
                 if 'communityManaged' in robotText:
                     projectIsCommunityManaged = True
@@ -80,8 +88,8 @@ class Robot:
                             elapsedTime = (datetime.datetime.now() - timeOpened).total_seconds()
                             
                             
-                            fourtyEightHoursInSeconds = 172800
-                            if elapsedTime < fourtyEightHoursInSeconds:
+                            hoursInSeconds = numberOfHoursForVoting*3600
+                            if elapsedTime < hoursInSeconds:
                                 pass
                             else:
                                 if (upVotes - 1) > downVotes:         # back out the robot's vote
@@ -94,7 +102,7 @@ class Robot:
                                     prAsIssue.edit(state='closed')
                     
                     if not robotHasAlreadyCommented:
-                        commentText = "Congratulations on the pull request @" + pullRequest.user.login + "\n\n Now we need to decide as a community if we want to integrate these changes. You should vote by giving **this comment** a thumbs up or a thumbs down. Votes are counted in 48 hours. Ties will not be merged.\n\nI'm just a robot, but I love to see people contributing so I'm going vote thumbs up (but my vote won't count...)!"
+                        commentText = "Congratulations on the pull request @" + pullRequest.user.login + "\n\n Now we need to decide as a community if we want to integrate these changes. You should vote by giving **this comment** a thumbs up or a thumbs down. Votes are counted in "+ str(numberOfHoursForVoting) +" hours. Ties will not be merged.\n\nI'm just a robot, but I love to see people contributing so I'm going vote thumbs up (but my vote won't count...)!"
                         theNewComment = prAsIssue.create_comment(commentText)
                         theNewComment.create_reaction("+1")
                 
@@ -173,14 +181,13 @@ class Robot:
             newFileText = fileText.replace(stringToReplace, replaceWithString)
             
             print repo.full_name
-            print "We have made a change?"
-            print fileText != newFileText
             
             if fileText != newFileText: #if we have fixed at least one link
                 
                 repo.update_file(fileName, "fix image links", newFileText, fileContents.sha)
-        except:
+        except Exception as e:
             print "unable to update image links for" + str(repo.name)
+            print e
     
     def acceptInvitations(self, user):
         '''
